@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - ShopSphere{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="row g-4">
+    
+    <!-- Profile Left Navigation -->
+    <div class="col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-center mb-4">
+        <div class="mb-3 position-relative d-inline-block mx-auto">
+          {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" alt="{{ user.full_name }}" class="rounded-circle border object-fit-cover shadow-sm" width="96" height="96">
+          {% else %}
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-sm mx-auto" style="width: 96px; height: 96px; font-size: 2.5rem; font-weight: 700;">
+              {{ user.first_name|default:user.username|slice:":1"|upper }}
+            </div>
+          {% endif %}
+        </div>
+        <h5 class="fw-bold mb-0 text-dark">{{ user.full_name }}</h5>
+        <small class="text-muted text-truncate d-block mb-2">{{ user.email }}</small>
+        <span class="badge bg-success-subtle text-success small rounded-pill px-3 py-1">Active Customer</span>
+      </div>
+
+      <div class="list-group shadow-sm rounded-4 border-0 overflow-hidden">
+        <a href="{% url 'accounts:profile' %}" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center gap-3 {% if active_tab == 'profile' %}bg-primary text-white fw-bold{% else %}text-dark{% endif %}">
+          <i class="bi bi-person fs-5"></i> Profile Overview
+        </a>
+        <a href="{% url 'orders:order_history' %}" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center gap-3 text-dark">
+          <i class="bi bi-box-seam fs-5"></i> Order History
+        </a>
+        <a href="{% url 'accounts:addresses' %}" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center gap-3 text-dark">
+          <i class="bi bi-geo-alt fs-5"></i> Address Book
+        </a>
+        <a href="{% url 'accounts:change_password' %}" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center gap-3 text-dark">
+          <i class="bi bi-shield-lock fs-5"></i> Change Password
+        </a>
+        <a href="{% url 'accounts:logout' %}" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center gap-3 text-danger">
+          <i class="bi bi-box-arrow-right fs-5"></i> Sign Out
+        </a>
+      </div>
+    </div>
+
+    <!-- Profile Main Body -->
+    <div class="col-lg-9">
+      
+      <!-- Edit Profile Card -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <h5 class="fw-bold mb-3 pb-2 border-bottom">Profile Information</h5>
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">First Name</label>
+              {{ form.first_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Last Name</label>
+              {{ form.last_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Username</label>
+              {{ form.username }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Email Address (Registered)</label>
+              {{ form.email }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Phone Number</label>
+              {{ form.phone_number }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Profile Photo</label>
+              {{ form.profile_picture }}
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+            Save Changes
+          </button>
+        </form>
+      </div>
+
+      <!-- Recent Orders Summary -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+          <h5 class="fw-bold mb-0">Recent Orders</h5>
+          <a href="{% url 'orders:order_history' %}" class="small text-primary fw-semibold text-decoration-none">View All &rarr;</a>
+        </div>
+
+        {% if recent_orders %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 small">
+              <thead>
+                <tr class="table-light">
+                  <th>Order #</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th class="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for o in recent_orders %}
+                  <tr>
+                    <td><strong class="text-dark">#{{ o.order_number }}</strong></td>
+                    <td>{{ o.created_at|date:"M d, Y" }}</td>
+                    <td class="fw-bold text-primary">${{ o.total_amount }}</td>
+                    <td><span class="badge {{ o.status_badge_class }}">{{ o.order_status }}</span></td>
+                    <td class="text-end">
+                      <a href="{% url 'orders:order_detail' order_number=o.order_number %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                        View
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted small mb-0">No past orders found.</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

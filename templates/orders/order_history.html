@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Order History - ShopSphere{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-1"><i class="bi bi-box-seam text-primary me-2"></i> Order History</h3>
+      <p class="text-muted small mb-0">Track all your past and active orders placed on ShopSphere.</p>
+    </div>
+    <a href="{% url 'products:product_list' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
+      Browse Catalog &rarr;
+    </a>
+  </div>
+
+  <!-- Status Filter Nav Pills -->
+  <div class="mb-4 overflow-auto pb-2">
+    <div class="d-flex gap-2">
+      <a href="{% url 'orders:order_history' %}" class="btn btn-sm rounded-pill px-3 fw-semibold {% if not status_filter %}btn-primary{% else %}btn-light border{% endif %}">
+        All Orders
+      </a>
+      <a href="{% url 'orders:order_history' %}?status=Confirmed" class="btn btn-sm rounded-pill px-3 fw-semibold {% if status_filter == 'Confirmed' %}btn-primary{% else %}btn-light border{% endif %}">
+        Confirmed
+      </a>
+      <a href="{% url 'orders:order_history' %}?status=Processing" class="btn btn-sm rounded-pill px-3 fw-semibold {% if status_filter == 'Processing' %}btn-primary{% else %}btn-light border{% endif %}">
+        Processing
+      </a>
+      <a href="{% url 'orders:order_history' %}?status=Shipped" class="btn btn-sm rounded-pill px-3 fw-semibold {% if status_filter == 'Shipped' %}btn-primary{% else %}btn-light border{% endif %}">
+        Shipped
+      </a>
+      <a href="{% url 'orders:order_history' %}?status=Delivered" class="btn btn-sm rounded-pill px-3 fw-semibold {% if status_filter == 'Delivered' %}btn-primary{% else %}btn-light border{% endif %}">
+        Delivered
+      </a>
+      <a href="{% url 'orders:order_history' %}?status=Cancelled" class="btn btn-sm rounded-pill px-3 fw-semibold {% if status_filter == 'Cancelled' %}btn-primary{% else %}btn-light border{% endif %}">
+        Cancelled
+      </a>
+    </div>
+  </div>
+
+  {% if orders %}
+    <div class="d-flex flex-column gap-4">
+      {% for order in orders %}
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+          
+          <!-- Order Card Header -->
+          <div class="card-header bg-light border-bottom p-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="d-flex flex-wrap align-items-center gap-3 small">
+              <div>
+                <span class="text-muted">Order ID:</span>
+                <strong class="text-dark">#{{ order.order_number }}</strong>
+              </div>
+              <span class="text-muted">|</span>
+              <div>
+                <span class="text-muted">Order Date:</span>
+                <strong class="text-dark">{{ order.created_at|date:"M d, Y" }}</strong>
+              </div>
+              <span class="text-muted">|</span>
+              <div>
+                <span class="text-muted">Total:</span>
+                <strong class="text-primary">${{ order.total_amount }}</strong>
+              </div>
+            </div>
+
+            <!-- Status Badges -->
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge {{ order.status_badge_class }} rounded-pill px-3 py-2 fw-semibold">
+                {{ order.order_status }}
+              </span>
+              <span class="badge {{ order.payment_badge_class }} rounded-pill px-2 py-1 small">
+                {{ order.payment_status }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Order Card Body (Items) -->
+          <div class="card-body p-4">
+            <div class="row align-items-center g-3">
+              <div class="col-md-8">
+                <div class="d-flex flex-column gap-3">
+                  {% for item in order.items.all %}
+                    <div class="d-flex align-items-center gap-3">
+                      <img src="{{ item.product_image_url|default:item.product.display_image }}" alt="{{ item.product_name }}" class="rounded-3 border object-fit-cover" width="60" height="60">
+                      <div>
+                        <h6 class="mb-1 fw-bold text-dark">{{ item.product_name }}</h6>
+                        <small class="text-muted">Qty: {{ item.quantity }} &times; ${{ item.unit_price }} = <strong>${{ item.total_price }}</strong></small>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Action Links -->
+              <div class="col-md-4 text-md-end border-top border-md-top-0 pt-3 pt-md-0">
+                <div class="d-flex flex-column gap-2 align-items-md-end">
+                  <a href="{% url 'orders:order_detail' order_number=order.order_number %}" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold">
+                    <i class="bi bi-eye me-1"></i> View Details & Track
+                  </a>
+                  <a href="{% url 'orders:download_invoice' order_number=order.order_number %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-semibold">
+                    <i class="bi bi-file-earmark-pdf me-1"></i> Download Invoice
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card border-0 shadow-sm rounded-4 p-5 text-center my-4">
+      <div class="mb-3">
+        <i class="bi bi-box-seam text-muted opacity-50" style="font-size: 3.5rem;"></i>
+      </div>
+      <h4 class="fw-bold">No Orders Found</h4>
+      <p class="text-muted small max-w-500 mx-auto mb-4">
+        {% if status_filter %}
+          You don't have any orders with status "{{ status_filter }}".
+        {% else %}
+          You haven't placed any orders yet. Discover our latest collections and start shopping today!
+        {% endif %}
+      </p>
+      <div>
+        <a href="{% url 'products:product_list' %}" class="btn btn-primary rounded-pill px-4 fw-semibold shadow">
+          Explore Products &rarr;
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

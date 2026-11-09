@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}About ShopSphere - Our Story & Vision{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  
+  <!-- Hero Section -->
+  <div class="text-center max-w-700 mx-auto mb-5">
+    <span class="badge bg-primary-subtle text-primary fw-bold text-uppercase px-3 py-1 rounded-pill mb-2">Our Mission</span>
+    <h1 class="display-5 fw-bold mb-3">Redefining Modern Online Shopping</h1>
+    <p class="text-secondary leading-relaxed" style="font-size: 1.1rem;">
+      ShopSphere is an advanced, production-grade e-commerce ecosystem designed to blend speed, aesthetic elegance, and reliable security for modern international shoppers and enterprise retail.
+    </p>
+  </div>
+
+  <!-- Key Metrics Row -->
+  <div class="row g-4 mb-5 text-center">
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <div class="display-5 fw-bold text-primary mb-1">150K+</div>
+        <div class="text-muted small fw-semibold">Delighted Shoppers</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <div class="display-5 fw-bold text-success mb-1">10,000+</div>
+        <div class="text-muted small fw-semibold">Curated Products</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <div class="display-5 fw-bold text-warning mb-1">99.8%</div>
+        <div class="text-muted small fw-semibold">On-Time Dispatch</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <div class="display-5 fw-bold text-purple mb-1">4.9★</div>
+        <div class="text-muted small fw-semibold">Customer Satisfaction</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core Values -->
+  <div class="row g-4 mb-5 align-items-center">
+    <div class="col-lg-6">
+      <img src="https://images.unsplash.com/photo-1556742049-0a67e5574f73?w=1000&auto=format&fit=crop&q=80" alt="ShopSphere Team & Fulfillment" class="rounded-4 shadow-sm img-fluid w-100">
+    </div>
+    <div class="col-lg-6">
+      <h3 class="fw-bold mb-3">Engineered for Performance & Trust</h3>
+      <p class="text-secondary leading-relaxed mb-4">
+        Every interaction in ShopSphere is architected around friction-free convenience: real-time stock validations, instant Razorpay payment verification, dynamic coupon engines, and automated branded invoice generation.
+      </p>
+
+      <div class="d-flex flex-column gap-3">
+        <div class="d-flex align-items-start gap-3">
+          <div class="benefit-icon-box" style="width: 42px; height: 42px; font-size: 1.25rem;">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1">Authentic Quality Standard</h6>
+            <small class="text-muted">We partner exclusively with certified brands, ethical manufacturers, and verified suppliers.</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-start gap-3">
+          <div class="benefit-icon-box" style="width: 42px; height: 42px; font-size: 1.25rem;">
+            <i class="bi bi-speedometer2"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1">High-Speed Fulfillment</h6>
+            <small class="text-muted">Orders placed before 2 PM ship the exact same business day with automated tracking.</small>
+          </div>
+        </div>
+        <div class="d-flex align-items-start gap-3">
+          <div class="benefit-icon-box" style="width: 42px; height: 42px; font-size: 1.25rem;">
+            <i class="bi bi-headset"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-1">24/7 Human-First Support</h6>
+            <small class="text-muted">Real product specialists available around the clock to assist with inquiries, sizing, and returns.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Call to action -->
+  <div class="p-5 rounded-4 text-center text-white shadow-sm" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+    <h2 class="fw-bold mb-2">Ready to Experience ShopSphere?</h2>
+    <p class="text-light opacity-75 small mb-4 max-w-600 mx-auto">
+      Explore top categories, take advantage of seasonal discounts, and enjoy seamless doorstep delivery.
+    </p>
+    <a href="{% url 'products:product_list' %}" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">
+      Browse Catalog Now &rarr;
+    </a>
+  </div>
+
+</div>
+{% endblock %}

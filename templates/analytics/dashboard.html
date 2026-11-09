@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+
+{% block title %}Store Analytics & Management - ShopSphere{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+      <div class="d-flex align-items-center gap-2">
+        <h3 class="fw-bold mb-0">Store Analytics & Order Management</h3>
+        <span class="badge bg-primary text-white rounded-pill px-3 py-1">Staff Admin</span>
+      </div>
+      <p class="text-muted small mb-0">Real-time revenue metrics, inventory health, and operational fulfillment dashboard.</p>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <a href="/admin/" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-semibold">
+        <i class="bi bi-gear-fill me-1"></i> Django Admin Panel
+      </a>
+      <a href="{% url 'products:product_list' %}" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold">
+        <i class="bi bi-shop me-1"></i> View Live Store
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Cards Row -->
+  <div class="row g-3 mb-4">
+    
+    <!-- Total Revenue -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="text-muted small fw-semibold text-uppercase">Total Sales Revenue</span>
+          <div class="benefit-icon-box" style="width: 38px; height: 38px; font-size: 1.1rem; background-color: #ecfdf5; color: #059669;">
+            <i class="bi bi-currency-dollar"></i>
+          </div>
+        </div>
+        <div class="display-6 fw-bold text-dark mb-1">${{ total_revenue|floatformat:2 }}</div>
+        <small class="text-success fw-semibold"><i class="bi bi-graph-up-arrow me-1"></i> Completed orders net</small>
+      </div>
+    </div>
+
+    <!-- Total Orders -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="text-muted small fw-semibold text-uppercase">Total Orders</span>
+          <div class="benefit-icon-box" style="width: 38px; height: 38px; font-size: 1.1rem; background-color: #eff6ff; color: #2563eb;">
+            <i class="bi bi-box-seam"></i>
+          </div>
+        </div>
+        <div class="display-6 fw-bold text-dark mb-1">{{ total_orders }}</div>
+        <small class="text-muted">Lifetime orders recorded</small>
+      </div>
+    </div>
+
+    <!-- Total Customers -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="text-muted small fw-semibold text-uppercase">Registered Buyers</span>
+          <div class="benefit-icon-box" style="width: 38px; height: 38px; font-size: 1.1rem; background-color: #f5f3ff; color: #7c3aed;">
+            <i class="bi bi-people"></i>
+          </div>
+        </div>
+        <div class="display-6 fw-bold text-dark mb-1">{{ total_customers }}</div>
+        <small class="text-muted">Verified customer profiles</small>
+      </div>
+    </div>
+
+    <!-- Total Products & Low Stock -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="text-muted small fw-semibold text-uppercase">Catalog Items</span>
+          <div class="benefit-icon-box" style="width: 38px; height: 38px; font-size: 1.1rem; background-color: #fffbeb; color: #d97706;">
+            <i class="bi bi-tags"></i>
+          </div>
+        </div>
+        <div class="display-6 fw-bold text-dark mb-1">{{ total_products }}</div>
+        {% if low_stock_products > 0 %}
+          <small class="text-danger fw-semibold"><i class="bi bi-exclamation-circle-fill me-1"></i> {{ low_stock_products }} low-stock alerts</small>
+        {% else %}
+          <small class="text-success fw-semibold"><i class="bi bi-check-circle-fill me-1"></i> Inventory optimal</small>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row g-4 mb-4">
+    
+    <!-- Chart 1: Revenue Trend -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Monthly Revenue Trend ($)</h5>
+          <span class="badge bg-light text-muted border">Last 6 Months</span>
+        </div>
+        <div style="height: 300px; position: relative;">
+          <canvas id="revenueTrendChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 2: Order Status Distribution -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <h5 class="fw-bold mb-3">Orders by Status</h5>
+        <div style="height: 250px; position: relative;" class="d-flex align-items-center justify-content-center">
+          <canvas id="orderStatusChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Second Row: Top Products & Live Order Management -->
+  <div class="row g-4 mb-4">
+    
+    <!-- Top Selling Products -->
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <h5 class="fw-bold mb-3 pb-2 border-bottom">Top Selling Products</h5>
+        
+        {% if top_products %}
+          <div class="d-flex flex-column gap-3">
+            {% for prod in top_products %}
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle bg-light border fw-bold d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                    #{{ forloop.counter }}
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-semibold text-truncate small" style="max-width: 220px;" title="{{ prod.product_name }}">{{ prod.product_name }}</h6>
+                    <small class="text-muted">{{ prod.total_sold }} units sold</small>
+                  </div>
+                </div>
+                <div class="fw-bold text-dark small">${{ prod.total_earned }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted small">No product sales recorded yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Category Distribution Chart -->
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <h5 class="fw-bold mb-3">Product Catalog by Category</h5>
+        <div style="height: 260px; position: relative;">
+          <canvas id="categoryDistributionChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Live Orders Management Table -->
+  <div class="card border-0 shadow-sm rounded-4 p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+      <div>
+        <h5 class="fw-bold mb-0">Recent Orders & Fast Fulfillment Control</h5>
+        <small class="text-muted">Update order status live to demonstrate tracking pipeline transitions.</small>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 small">
+        <thead class="table-light">
+          <tr>
+            <th>Order Number</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Total</th>
+            <th>Payment</th>
+            <th>Current Status</th>
+            <th class="text-end" style="min-width: 200px;">Change Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in recent_orders %}
+            <tr>
+              <td>
+                <a href="{% url 'orders:order_detail' order_number=order.order_number %}" class="fw-bold text-dark text-decoration-none">
+                  #{{ order.order_number }}
+                </a>
+              </td>
+              <td>
+                <div class="fw-semibold text-dark">{{ order.shipping_full_name }}</div>
+                <small class="text-muted">{{ order.user.email }}</small>
+              </td>
+              <td>{{ order.created_at|date:"M d, Y" }}</td>
+              <td class="fw-bold text-primary">${{ order.total_amount }}</td>
+              <td>
+                <span class="badge {{ order.payment_badge_class }}">{{ order.payment_status }}</span>
+                <small class="text-muted d-block">{{ order.payment_method }}</small>
+              </td>
+              <td>
+                <span class="badge {{ order.status_badge_class }} rounded-pill px-3 py-1">
+                  {{ order.order_status }}
+                </span>
+              </td>
+              <td class="text-end">
+                <form method="POST" class="d-inline-flex align-items-center gap-1 justify-content-end">
+                  {% csrf_token %}
+                  <input type="hidden" name="update_order_id" value="{{ order.id }}">
+                  <select name="new_status" class="form-select form-select-sm rounded-pill" style="width: 120px;">
+                    {% for code, label in order_status_choices %}
+                      <option value="{{ code }}" {% if order.order_status == code %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn btn-primary btn-sm rounded-pill px-2" title="Save Status">
+                    <i class="bi bi-check-lg"></i>
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">No orders found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    
+    // 1. Monthly Revenue Line Chart
+    const revenueLabels = {{ months_labels_json|safe }};
+    const revenueData = {{ revenue_data_json|safe }};
+
+    const ctxRev = document.getElementById('revenueTrendChart').getContext('2d');
+    new Chart(ctxRev, {
+      type: 'line',
+      data: {
+        labels: revenueLabels,
+        datasets: [{
+          label: 'Revenue ($)',
+          data: revenueData,
+          borderColor: '#2563eb',
+          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 3,
+          pointBackgroundColor: '#2563eb',
+          pointRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(val) { return '$' + val; }
+            }
+          }
+        }
+      }
+    });
+
+    // 2. Order Status Doughnut Chart
+    const statusLabels = {{ status_labels_json|safe }};
+    const statusValues = {{ status_values_json|safe }};
+
+    const ctxStatus = document.getElementById('orderStatusChart').getContext('2d');
+    new Chart(ctxStatus, {
+      type: 'doughnut',
+      data: {
+        labels: statusLabels,
+        datasets: [{
+          data: statusValues,
+          backgroundColor: [
+            '#f59e0b', // Pending
+            '#06b6d4', // Confirmed
+            '#3b82f6', // Processing
+            '#8b5cf6', // Shipped
+            '#10b981', // Delivered
+            '#ef4444'  // Cancelled
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 12, font: { size: 11 } }
+          }
+        }
+      }
+    });
+
+    // 3. Category Distribution Bar Chart
+    const catLabels = {{ category_labels_json|safe }};
+    const catValues = {{ category_values_json|safe }};
+
+    const ctxCat = document.getElementById('categoryDistributionChart').getContext('2d');
+    new Chart(ctxCat, {
+      type: 'bar',
+      data: {
+        labels: catLabels,
+        datasets: [{
+          label: 'Products Count',
+          data: catValues,
+          backgroundColor: '#3b82f6',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+  });
+</script>
+{% endblock %}

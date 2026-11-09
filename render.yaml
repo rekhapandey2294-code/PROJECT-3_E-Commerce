@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: shopsphere-ecommerce
+    runtime: python
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate && python manage.py seed_data"
+    startCommand: "gunicorn shopsphere.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DB_ENGINE
+        value: "sqlite"
+      - key: RAZORPAY_KEY_ID
+        value: "rzp_test_shopsphere123"
+      - key: RAZORPAY_KEY_SECRET
+        value: "secret_shopsphere456"

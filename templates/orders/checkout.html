@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - ShopSphere{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Step Bar -->
+  <div class="d-flex align-items-center justify-content-center gap-3 mb-4 text-center">
+    <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 fw-bold">1. Shopping Cart</span>
+    <i class="bi bi-chevron-right text-muted"></i>
+    <span class="badge bg-primary rounded-pill px-3 py-2 fw-bold">2. Delivery & Payment</span>
+    <i class="bi bi-chevron-right text-muted"></i>
+    <span class="badge bg-light text-muted border rounded-pill px-3 py-2">3. Confirmation</span>
+  </div>
+
+  <form action="{% url 'orders:place_order' %}" method="POST" id="checkoutForm">
+    {% csrf_token %}
+    
+    <div class="row g-4">
+      
+      <!-- Left Column: Shipping Address & Payment Selection -->
+      <div class="col-lg-8">
+        
+        <!-- Delivery Address Selection Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="bi bi-geo-alt-fill text-primary me-2"></i> 1. Select Delivery Destination</h5>
+            <a href="{% url 'accounts:address_create' %}?next={% url 'orders:checkout' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
+              <i class="bi bi-plus-lg me-1"></i> Add New Address
+            </a>
+          </div>
+
+          {% if addresses %}
+            <div class="row g-3 mb-3">
+              {% for addr in addresses %}
+                <div class="col-md-6">
+                  <label class="card h-100 p-3 border rounded-3 cursor-pointer address-card position-relative {% if addr.is_default_shipping or forloop.first %}border-primary bg-primary-subtle{% endif %}">
+                    <div class="d-flex align-items-start gap-2">
+                      <input 
+                        type="radio" 
+                        name="address_id" 
+                        value="{{ addr.id }}" 
+                        class="form-check-input mt-1" 
+                        {% if addr.is_default_shipping or forloop.first %}checked{% endif %}
+                        onchange="toggleNewAddressForm(false)"
+                      >
+                      <div class="small">
+                        <div class="fw-bold text-dark d-flex align-items-center gap-2">
+                          {{ addr.full_name }}
+                          {% if addr.is_default_shipping %}
+                            <span class="badge bg-primary" style="font-size: 0.65rem;">DEFAULT</span>
+                          {% endif %}
+                        </div>
+                        <div class="text-secondary mt-1">
+                          {{ addr.address_line_1 }}<br/>
+                          {% if addr.address_line_2 %}{{ addr.address_line_2 }}<br/>{% endif %}
+                          {{ addr.city }}, {{ addr.state }} {{ addr.postal_code }}<br/>
+                          {{ addr.country }}
+                        </div>
+                        <div class="text-muted mt-1"><i class="bi bi-telephone me-1"></i> {{ addr.phone_number }}</div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+
+            <!-- Option to expand custom new address -->
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="address_id" value="new" id="addrNewRadio" onchange="toggleNewAddressForm(true)">
+              <label class="form-check-label fw-semibold small" for="addrNewRadio">
+                Ship to a different / new address
+              </label>
+            </div>
+          {% endif %}
+
+          <!-- Collapsible New Address Form Fields -->
+          <div id="newAddressFields" style="{% if addresses %}display: none;{% endif %}" class="pt-3 border-top mt-3">
+            <h6 class="fw-bold mb-3">Recipient & Address Details</h6>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Full Name *</label>
+                <input type="text" name="full_name" class="form-control" placeholder="Recipient's Name" value="{{ user.full_name }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Phone Number *</label>
+                <input type="text" name="phone_number" class="form-control" placeholder="10-digit mobile number" value="{{ user.phone_number|default:'' }}">
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-semibold">Street Address *</label>
+                <input type="text" name="address_line_1" class="form-control" placeholder="House, flat, or building number and street">
+              </div>
+              <div class="col-12">
+                <label class="form-label small fw-semibold">Apartment, Suite (Optional)</label>
+                <input type="text" name="address_line_2" class="form-control" placeholder="Apartment, unit, floor, etc.">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">City *</label>
+                <input type="text" name="city" class="form-control" placeholder="City">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">State / Province *</label>
+                <input type="text" name="state" class="form-control" placeholder="State">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Postal / Zip Code *</label>
+                <input type="text" name="postal_code" class="form-control" placeholder="ZIP Code">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Country</label>
+                <input type="text" name="country" class="form-control" value="India">
+              </div>
+              <div class="col-md-6 d-flex align-items-end">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="save_address" id="saveAddressCheck" checked>
+                  <label class="form-check-label small fw-semibold" for="saveAddressCheck">Save this address to my profile</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Payment Method Selection Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-credit-card-fill text-primary me-2"></i> 2. Choose Payment Method</h5>
+          
+          <div class="d-flex flex-column gap-3">
+            
+            <!-- Razorpay Online -->
+            <label class="card p-3 border rounded-3 cursor-pointer d-flex flex-row align-items-center gap-3">
+              <input type="radio" name="payment_method" value="Razorpay" class="form-check-input mt-0" checked>
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-bold text-dark">Online Payment (Razorpay / UPI / Cards / NetBanking)</span>
+                  <span class="badge bg-success small">Recommended</span>
+                </div>
+                <small class="text-muted d-block mt-1">Instant confirmation, 256-bit encryption with Razorpay test-mode gateway.</small>
+              </div>
+              <i class="bi bi-shield-check text-success fs-3"></i>
+            </label>
+
+            <!-- Cash on Delivery (COD) -->
+            <label class="card p-3 border rounded-3 cursor-pointer d-flex flex-row align-items-center gap-3">
+              <input type="radio" name="payment_method" value="COD" class="form-check-input mt-0">
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-bold text-dark">Cash on Delivery (COD)</span>
+                  <span class="badge bg-secondary small">Pay on Arrival</span>
+                </div>
+                <small class="text-muted d-block mt-1">Pay with cash or card upon package delivery at your doorstep.</small>
+              </div>
+              <i class="bi bi-cash-stack text-primary fs-3"></i>
+            </label>
+
+          </div>
+
+          <!-- Order Notes -->
+          <div class="mt-4 pt-3 border-top">
+            <label class="form-label small fw-semibold text-muted">Delivery Instructions / Order Notes (Optional):</label>
+            <textarea name="order_note" class="form-control" rows="2" placeholder="e.g. Please leave package with security guard or ring buzzer #402."></textarea>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Right Column: Order Review & Submit -->
+      <div class="col-lg-4">
+        <div class="order-summary-card sticky-lg-top" style="top: 90px;">
+          <h5 class="fw-bold mb-3 pb-2 border-bottom">Review Items ({{ cart.total_items }})</h5>
+
+          <!-- Items Mini List -->
+          <div class="d-flex flex-column gap-3 mb-4 overflow-auto" style="max-height: 250px;">
+            {% for item in cart.items.all %}
+              <div class="d-flex align-items-center gap-2">
+                <img src="{{ item.product.display_image }}" alt="{{ item.product.name }}" class="rounded-2 border object-fit-cover" width="48" height="48">
+                <div class="flex-grow-1 overflow-hidden">
+                  <div class="fw-semibold text-truncate small" title="{{ item.product.name }}">{{ item.product.name }}</div>
+                  <small class="text-muted">Qty: {{ item.quantity }} &times; ${{ item.unit_price }}</small>
+                </div>
+                <div class="fw-bold text-dark small">${{ item.total_price }}</div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <hr class="text-muted opacity-25 my-3">
+
+          <!-- Price Calculation -->
+          <div class="d-flex justify-content-between mb-2 small">
+            <span class="text-muted">Subtotal:</span>
+            <span class="fw-semibold text-dark">${{ cart.subtotal }}</span>
+          </div>
+
+          <div class="d-flex justify-content-between mb-2 small">
+            <span class="text-muted">Shipping:</span>
+            <span class="fw-semibold text-dark">
+              {% if cart.shipping_charge == 0 %}
+                <span class="text-success fw-bold">FREE</span>
+              {% else %}
+                ${{ cart.shipping_charge }}
+              {% endif %}
+            </span>
+          </div>
+
+          {% if cart.coupon %}
+            <div class="d-flex justify-content-between mb-2 small">
+              <span class="text-muted">Coupon ({{ cart.coupon.code }}):</span>
+              <span class="fw-bold text-success">-${{ cart.discount_amount }}</span>
+            </div>
+          {% endif %}
+
+          <hr class="text-muted opacity-25 my-3">
+
+          <div class="d-flex justify-content-between align-items-baseline mb-4">
+            <span class="fs-5 fw-bold text-dark">Order Total:</span>
+            <span class="fs-4 fw-bold text-primary">${{ cart.final_total }}</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg rounded-pill w-100 fw-bold shadow">
+            Confirm & Place Order <i class="bi bi-shield-check ms-1"></i>
+          </button>
+
+          <div class="text-center mt-3 text-muted" style="font-size: 0.75rem;">
+            By placing your order, you agree to ShopSphere's Terms of Service and Privacy Policy.
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+</div>
+
+<script>
+  function toggleNewAddressForm(show) {
+    const fields = document.getElementById('newAddressFields');
+    if (fields) {
+      fields.style.display = show ? 'block' : 'none';
+      const inputs = fields.querySelectorAll('input[type="text"]');
+      inputs.forEach(input => {
+        if (input.name !== 'address_line_2') {
+          input.required = show;
+        }
+      });
+    }
+  }
+</script>
+{% endblock %}

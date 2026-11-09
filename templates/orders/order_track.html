@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Your Order - ShopSphere{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <div class="text-center mb-5">
+        <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center p-3 mb-2">
+          <i class="bi bi-radar display-5"></i>
+        </div>
+        <h2 class="fw-bold">Real-Time Order Tracking</h2>
+        <p class="text-muted small max-w-600 mx-auto">
+          Enter your ShopSphere Order ID or Tracking Number along with your email to check the live status of your shipment.
+        </p>
+      </div>
+
+      <!-- Tracking Search Box -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <form method="GET" action="{% url 'orders:order_track' %}" class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Order ID or Tracking Number *</label>
+            <input type="text" name="order_number" class="form-control" placeholder="e.g. SPH-20261109-XXXX or TRK..." value="{{ request.GET.order_number|default:'' }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Registered Email Address</label>
+            <input type="email" name="email" class="form-control" placeholder="name@example.com" value="{{ request.GET.email|default:'' }}">
+          </div>
+          <div class="col-12 text-center">
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+              <i class="bi bi-search me-1"></i> Track Shipment
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Error / Not Found Message -->
+      {% if error_message %}
+        <div class="alert alert-danger rounded-4 p-4 text-center border-0 shadow-sm mb-4">
+          <i class="bi bi-exclamation-triangle-fill fs-3 mb-2 d-block"></i>
+          <h6 class="fw-bold mb-1">Order Not Found</h6>
+          <p class="small mb-0">{{ error_message }}</p>
+        </div>
+      {% endif %}
+
+      <!-- Search Results / Tracking Pipeline -->
+      {% if order %}
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4">
+          
+          <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom mb-4 gap-2">
+            <div>
+              <span class="text-muted small">Tracking for:</span>
+              <h4 class="fw-bold text-dark mb-0">#{{ order.order_number }}</h4>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge {{ order.status_badge_class }} rounded-pill px-3 py-2 fs-6">
+                {{ order.order_status }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="tracking-timeline px-lg-4 mb-4">
+            {% for step in timeline %}
+              <div class="timeline-step {{ step.state }}">
+                <div class="timeline-icon-node">
+                  <i class="bi {{ step.icon }}"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="fw-bold mb-1 {% if step.state == 'current' %}text-primary{% elif step.state == 'cancelled' %}text-danger{% else %}text-dark{% endif %}">
+                    {{ step.title }}
+                  </h6>
+                  <p class="text-muted small mb-0">{{ step.desc }}</p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <!-- Metadata Box -->
+          <div class="p-3 bg-light rounded-3 mb-4 small">
+            <div class="row g-2">
+              <div class="col-sm-6">
+                <strong>Tracking ID:</strong> {{ order.tracking_number }}
+              </div>
+              <div class="col-sm-6">
+                <strong>Estimated Delivery:</strong> {{ order.estimated_delivery|date:"l, F d, Y" }}
+              </div>
+              <div class="col-sm-6">
+                <strong>Destination:</strong> {{ order.shipping_city }}, {{ order.shipping_state }}
+              </div>
+              <div class="col-sm-6">
+                <strong>Order Total:</strong> ${{ order.total_amount }} ({{ order.total_quantity }} items)
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <a href="{% url 'orders:download_invoice' order_number=order.order_number %}" class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-semibold">
+              <i class="bi bi-file-earmark-pdf me-1"></i> Download Invoice
+            </a>
+          </div>
+
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmed #{{ order.order_number }} - ShopSphere{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 text-center mb-4">
+        
+        <!-- Animated Success Badge -->
+        <div class="mb-3">
+          <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center shadow" style="width: 80px; height: 80px; font-size: 2.5rem;">
+            <i class="bi bi-check-lg"></i>
+          </div>
+        </div>
+
+        <h2 class="fw-bold text-dark mb-1">Thank You! Your Order is Confirmed</h2>
+        <p class="text-muted small mb-4">
+          We have sent a receipt and confirmation email to <strong class="text-dark">{{ order.user.email }}</strong>.
+        </p>
+
+        <!-- Order Snapshot Details Box -->
+        <div class="card bg-light border-0 rounded-4 p-3 mb-4 text-start">
+          <div class="row g-3">
+            <div class="col-sm-6 col-md-3">
+              <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Order Number</small>
+              <div class="fw-bold text-dark text-truncate">{{ order.order_number }}</div>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Date Placed</small>
+              <div class="fw-bold text-dark">{{ order.created_at|date:"M d, Y" }}</div>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Payment Method</small>
+              <div class="fw-bold text-dark">{{ order.get_payment_method_display }}</div>
+            </div>
+            <div class="col-sm-6 col-md-3">
+              <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.7rem;">Total Paid</small>
+              <div class="fw-bold text-primary">${{ order.total_amount }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Ordered -->
+        <div class="text-start mb-4">
+          <h6 class="fw-bold text-dark mb-3">Items in This Shipment</h6>
+          <div class="card border rounded-3 p-3">
+            <div class="d-flex flex-column gap-3">
+              {% for item in order.items.all %}
+                <div class="d-flex align-items-center justify-content-between gap-3 {% if not forloop.last %}border-bottom pb-3{% endif %}">
+                  <div class="d-flex align-items-center gap-3">
+                    <img src="{{ item.product_image_url|default:item.product.display_image }}" alt="{{ item.product_name }}" class="rounded-2 border object-fit-cover" width="54" height="54">
+                    <div>
+                      <h6 class="mb-0 fw-semibold text-dark">{{ item.product_name }}</h6>
+                      <small class="text-muted">Quantity: {{ item.quantity }} &times; ${{ item.unit_price }}</small>
+                    </div>
+                  </div>
+                  <div class="fw-bold text-dark">${{ item.total_price }}</div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Destination -->
+        <div class="text-start mb-4">
+          <h6 class="fw-bold text-dark mb-2">Delivery Destination</h6>
+          <p class="text-secondary small mb-0">
+            <strong>{{ order.shipping_full_name }}</strong><br>
+            {{ order.shipping_address_line1 }}<br>
+            {% if order.shipping_address_line2 %}{{ order.shipping_address_line2 }}<br>{% endif %}
+            {{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_postal_code }}, {{ order.shipping_country }}<br>
+            Phone: {{ order.shipping_phone }}
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex flex-wrap justify-content-center gap-3 pt-3 border-top">
+          <a href="{% url 'orders:download_invoice' order_number=order.order_number %}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Download PDF Invoice
+          </a>
+          <a href="{% url 'orders:order_detail' order_number=order.order_number %}" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+            <i class="bi bi-geo-alt me-1"></i> Track Order Live
+          </a>
+          <a href="{% url 'products:product_list' %}" class="btn btn-light border rounded-pill px-4 fw-semibold">
+            Continue Shopping
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

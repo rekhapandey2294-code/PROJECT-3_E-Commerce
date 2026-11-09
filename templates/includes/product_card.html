@@ -1,0 +1,85 @@
+<div class="product-card">
+  
+  <!-- Image & Badges -->
+  <div class="product-img-wrapper">
+    
+    <!-- Badges -->
+    <div class="product-badge-group">
+      {% if product.discount_percentage > 0 %}
+        <span class="badge-discount">-{{ product.discount_percentage }}% OFF</span>
+      {% endif %}
+      {% if product.is_bestseller %}
+        <span class="badge-featured bg-dark text-white"><i class="bi bi-fire text-warning me-1"></i> Bestseller</span>
+      {% elif product.is_new_arrival %}
+        <span class="badge-featured bg-primary text-white"><i class="bi bi-sparkles me-1"></i> New</span>
+      {% endif %}
+    </div>
+
+    <!-- Wishlist Button -->
+    <button 
+      type="button" 
+      class="wishlist-toggle-btn btn-wishlist-toggle {% if product.id in wishlist_ids or product.id in wishlist_product_ids or in_wishlist %}active{% endif %}" 
+      data-product-id="{{ product.id }}"
+      title="Add to Wishlist"
+    >
+      <i class="bi {% if product.id in wishlist_ids or product.id in wishlist_product_ids or in_wishlist %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+    </button>
+
+    <!-- Product Link & Image -->
+    <a href="{% url 'products:product_detail' slug=product.slug %}">
+      <img src="{{ product.display_image }}" alt="{{ product.name }}" loading="lazy">
+    </a>
+  </div>
+
+  <!-- Body -->
+  <div class="product-card-body">
+    {% if product.brand %}
+      <div class="product-brand">{{ product.brand }}</div>
+    {% endif %}
+
+    <a href="{% url 'products:product_detail' slug=product.slug %}" class="product-title" title="{{ product.name }}">
+      {{ product.name }}
+    </a>
+
+    <!-- Rating -->
+    <div class="rating-box">
+      <span class="stars">
+        {% for star_state in product.rating_stars_list %}
+          {% if star_state == 'full' %}
+            <i class="bi bi-star-fill"></i>
+          {% elif star_state == 'half' %}
+            <i class="bi bi-star-half"></i>
+          {% else %}
+            <i class="bi bi-star"></i>
+          {% endif %}
+        {% endfor %}
+      </span>
+      <span class="fw-semibold text-dark">{{ product.average_rating }}</span>
+      <span class="review-count">({{ product.review_count }})</span>
+    </div>
+
+    <!-- Price -->
+    <div class="price-box">
+      <span class="final-price">${{ product.final_price }}</span>
+      {% if product.discount_price and product.discount_price < product.price %}
+        <span class="original-price">${{ product.price }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Add to Cart Form -->
+    {% if product.stock > 0 %}
+      <form action="{% url 'cart:add_to_cart' product_id=product.id %}" method="POST" class="form-add-to-cart mt-2">
+        {% csrf_token %}
+        <input type="hidden" name="quantity" value="1">
+        <button type="submit" class="btn btn-add-cart">
+          <i class="bi bi-cart-plus"></i> Add to Cart
+        </button>
+      </form>
+    {% else %}
+      <button class="btn btn-secondary w-100 mt-2 py-2 small fw-semibold disabled" style="border-radius: var(--radius-sm);" disabled>
+        Out of Stock
+      </button>
+    {% endif %}
+
+  </div>
+</div>

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Saved Addresses - ShopSphere{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    
+    <!-- Left Navigation -->
+    <div class="col-lg-3">
+      <div class="list-group shadow-sm rounded-4 border-0 overflow-hidden">
+        <a href="{% url 'accounts:profile' %}" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center gap-3 text-dark">
+          <i class="bi bi-person fs-5"></i> Profile Overview
+        </a>
+        <a href="{% url 'orders:order_history' %}" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center gap-3 text-dark">
+          <i class="bi bi-box-seam fs-5"></i> Order History
+        </a>
+        <a href="{% url 'accounts:addresses' %}" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center gap-3 bg-primary text-white fw-bold">
+          <i class="bi bi-geo-alt fs-5"></i> Address Book
+        </a>
+        <a href="{% url 'accounts:change_password' %}" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center gap-3 text-dark">
+          <i class="bi bi-shield-lock fs-5"></i> Change Password
+        </a>
+        <a href="{% url 'accounts:logout' %}" class="list-group-item list-group-item-action py-3 px-4 border-0 d-flex align-items-center gap-3 text-danger">
+          <i class="bi bi-box-arrow-right fs-5"></i> Sign Out
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Address List -->
+    <div class="col-lg-9">
+      <div class="card border-0 shadow-sm rounded-4 p-4">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+          <div>
+            <h5 class="fw-bold mb-0">Saved Delivery Addresses</h5>
+            <small class="text-muted">Manage your shipping and billing destinations for rapid checkout.</small>
+          </div>
+          <a href="{% url 'accounts:address_create' %}" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold">
+            <i class="bi bi-plus-lg me-1"></i> Add Address
+          </a>
+        </div>
+
+        {% if addresses %}
+          <div class="row g-3">
+            {% for addr in addresses %}
+              <div class="col-md-6">
+                <div class="card h-100 p-3 border rounded-3 position-relative {% if addr.is_default_shipping %}border-primary bg-primary-subtle{% endif %}">
+                  
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                      <h6 class="fw-bold text-dark mb-0">{{ addr.full_name }}</h6>
+                      <span class="badge bg-light text-muted border text-uppercase" style="font-size: 0.65rem;">{{ addr.get_address_type_display }}</span>
+                      {% if addr.is_default_shipping %}
+                        <span class="badge bg-primary" style="font-size: 0.65rem;">DEFAULT SHIPPING</span>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="text-secondary small flex-grow-1 mb-3">
+                    {{ addr.address_line_1 }}<br>
+                    {% if addr.address_line_2 %}{{ addr.address_line_2 }}<br>{% endif %}
+                    {{ addr.city }}, {{ addr.state }} {{ addr.postal_code }}<br>
+                    {{ addr.country }}<br>
+                    <div class="mt-2 text-muted"><i class="bi bi-telephone me-1"></i> {{ addr.phone_number }}</div>
+                  </div>
+
+                  <div class="d-flex align-items-center gap-2 pt-2 border-top small">
+                    <a href="{% url 'accounts:address_edit' pk=addr.pk %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                      Edit
+                    </a>
+                    
+                    {% if not addr.is_default_shipping %}
+                      <a href="{% url 'accounts:address_set_default' pk=addr.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-2">
+                        Set Default
+                      </a>
+                    {% endif %}
+
+                    <form action="{% url 'accounts:address_delete' pk=addr.pk %}" method="POST" class="ms-auto" onsubmit="return confirm('Delete this address?');">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Delete">
+                        <i class="bi bi-trash3 fs-6"></i>
+                      </button>
+                    </form>
+                  </div>
+
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-4 text-muted">
+            <i class="bi bi-geo-alt fs-1 opacity-50 mb-2 d-block"></i>
+            <p>No addresses saved yet. Add your first shipping destination now.</p>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

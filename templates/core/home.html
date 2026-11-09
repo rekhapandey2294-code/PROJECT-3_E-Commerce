@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+
+{% block title %}ShopSphere - Modern International E-Commerce{% endblock %}
+
+{% block content %}
+
+<!-- 1. Hero Carousel Section -->
+<section class="container mt-3 mb-4">
+  <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+    </div>
+    <div class="carousel-inner shadow-sm" style="border-radius: var(--radius-lg);">
+      
+      <!-- Slide 1 -->
+      <div class="carousel-item active hero-slider-item" style="background-image: url('https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1600&auto=format&fit=crop&q=80');">
+        <div class="hero-overlay">
+          <div class="col-lg-7 col-md-9">
+            <span class="hero-tag"><i class="bi bi-lightning-charge-fill me-1"></i> Mega Tech Season</span>
+            <h1 class="hero-title">Studio Sound.<br/>Zero Distractions.</h1>
+            <p class="hero-subtitle">Immerse yourself in high-fidelity acoustics with industry-leading active noise cancellation. Enjoy up to 40% off this week.</p>
+            <div class="d-flex align-items-center gap-3">
+              <a href="{% url 'products:product_list' %}?category=electronics-gadgets" class="btn btn-primary btn-lg rounded-pill px-4 fw-semibold shadow">
+                Explore Deals &rarr;
+              </a>
+              <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold">Use Code: SPHERE20</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="carousel-item hero-slider-item" style="background-image: url('https://images.unsplash.com/photo-1445205170230-053b83016050?w=1600&auto=format&fit=crop&q=80');">
+        <div class="hero-overlay">
+          <div class="col-lg-7 col-md-9">
+            <span class="hero-tag bg-purple"><i class="bi bi-stars me-1"></i> Haute Couture</span>
+            <h1 class="hero-title">Refined Elegance.<br/>Tailored For You.</h1>
+            <p class="hero-subtitle">Discover pure Italian wool suits, fluid silk evening gowns, and everyday luxury essentials engineered for lasting confidence.</p>
+            <a href="{% url 'products:product_list' %}?category=fashion-apparel" class="btn btn-light btn-lg rounded-pill px-4 fw-bold shadow">
+              Shop Collection &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="carousel-item hero-slider-item" style="background-image: url('https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1600&auto=format&fit=crop&q=80');">
+        <div class="hero-overlay">
+          <div class="col-lg-7 col-md-9">
+            <span class="hero-tag bg-success"><i class="bi bi-house-heart-fill me-1"></i> Modern Sanctuary</span>
+            <h1 class="hero-title">Elevate Your Living<br/>With Smart Design.</h1>
+            <p class="hero-subtitle">Upgrade your workspace and home with ergonomic executive seating, third-wave espresso machines, and ambient lighting.</p>
+            <a href="{% url 'products:product_list' %}?category=home-living" class="btn btn-primary btn-lg rounded-pill px-4 fw-semibold shadow">
+              Discover Home &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</section>
+
+<!-- 2. Value Benefits Bar -->
+<section class="container mb-5">
+  <div class="row g-3">
+    <div class="col-lg-3 col-sm-6">
+      <div class="benefit-card">
+        <div class="benefit-icon-box">
+          <i class="bi bi-truck"></i>
+        </div>
+        <div>
+          <h6 class="fw-bold mb-1">Free Delivery</h6>
+          <small class="text-muted">On all orders over $50</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+      <div class="benefit-card">
+        <div class="benefit-icon-box">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <div>
+          <h6 class="fw-bold mb-1">Buyer Protection</h6>
+          <small class="text-muted">100% Genuine guaranteed</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+      <div class="benefit-card">
+        <div class="benefit-icon-box">
+          <i class="bi bi-arrow-repeat"></i>
+        </div>
+        <div>
+          <h6 class="fw-bold mb-1">30-Day Returns</h6>
+          <small class="text-muted">Hassle-free easy refunds</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+      <div class="benefit-card">
+        <div class="benefit-icon-box">
+          <i class="bi bi-headset"></i>
+        </div>
+        <div>
+          <h6 class="fw-bold mb-1">24/7 Support</h6>
+          <small class="text-muted">Dedicated expert assistance</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Featured Categories Bubbles -->
+<section class="container mb-5">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">Shop by Category</h3>
+      <p class="text-muted mb-0 small">Handpicked selections across our most popular departments</p>
+    </div>
+    <a href="{% url 'products:product_list' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
+      View All <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+  
+  <div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 g-3">
+    {% for cat in featured_categories %}
+      <div class="col">
+        <a href="{% url 'products:product_list' %}?category={{ cat.slug }}" class="category-bubble-card">
+          <div class="bubble-img-wrapper">
+            <img src="{{ cat.display_image }}" alt="{{ cat.name }}">
+          </div>
+          <div class="bubble-name">{{ cat.name }}</div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- 4. Flash Deals of the Day (With Live Countdown) -->
+{% if deals_of_the_day %}
+<section class="container mb-5">
+  <div class="deals-banner-card shadow-sm">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-danger text-uppercase px-2 py-1 fw-bold">Flash Sale</span>
+          <span class="text-warning small fw-bold"><i class="bi bi-fire"></i> Up to 40% OFF</span>
+        </div>
+        <h2 class="fw-bold mb-1">Deals of the Day</h2>
+        <p class="text-light mb-0 opacity-75 small">Limited inventory at promotional prices. Grab yours before time runs out!</p>
+      </div>
+
+      <!-- Live Countdown UI -->
+      <div class="d-flex align-items-center gap-3">
+        <span class="small fw-semibold text-uppercase text-light opacity-75">Ends in:</span>
+        <div class="countdown-box">
+          <div class="countdown-unit">
+            <div id="dealHours" class="countdown-num">08</div>
+            <div class="countdown-label">Hours</div>
+          </div>
+          <div class="countdown-unit">
+            <div id="dealMinutes" class="countdown-num">45</div>
+            <div class="countdown-label">Mins</div>
+          </div>
+          <div class="countdown-unit">
+            <div id="dealSeconds" class="countdown-num">12</div>
+            <div class="countdown-label">Secs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deals Grid -->
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for product in deals_of_the_day|slice:":4" %}
+      <div class="col">
+        {% include 'includes/product_card.html' with product=product %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- 5. Dual Promotional Banners -->
+<section class="container mb-5">
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="p-4 p-lg-5 rounded-4 position-relative overflow-hidden text-white shadow-sm" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); min-height: 220px; display: flex; flex-direction: column; justify-content: center;">
+        <span class="badge bg-primary text-uppercase px-2 py-1 mb-2 align-self-start fw-bold">Special Promo</span>
+        <h3 class="fw-bold mb-2">Smart Technology & Wearables</h3>
+        <p class="text-light opacity-75 small mb-3">Titanium builds, ECG monitors, and multi-day battery power.</p>
+        <div>
+          <a href="{% url 'products:product_list' %}?category=electronics-gadgets" class="btn btn-light btn-sm rounded-pill px-3 fw-bold">
+            Shop Tech <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="p-4 p-lg-5 rounded-4 position-relative overflow-hidden text-white shadow-sm" style="background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%); min-height: 220px; display: flex; flex-direction: column; justify-content: center;">
+        <span class="badge bg-warning text-dark text-uppercase px-2 py-1 mb-2 align-self-start fw-bold">Exclusive Discount</span>
+        <h3 class="fw-bold mb-2">Designer Apparel & Footwear</h3>
+        <p class="text-light opacity-75 small mb-3">Premium calfskin sneakers and bespoke Italian tailoring.</p>
+        <div>
+          <a href="{% url 'products:product_list' %}?category=fashion-apparel" class="btn btn-warning text-dark btn-sm rounded-pill px-3 fw-bold">
+            Shop Fashion <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Featured Products Grid -->
+<section class="container mb-5">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h3 class="fw-bold mb-1">Featured Products</h3>
+      <p class="text-muted mb-0 small">Our highest recommended items based on customer satisfaction</p>
+    </div>
+    <a href="{% url 'products:product_list' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
+      Explore All <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for product in featured_products %}
+      <div class="col">
+        {% include 'includes/product_card.html' with product=product %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- 7. Best Sellers & New Arrivals Tabs -->
+<section class="container mb-5">
+  <div class="card border-0 shadow-sm rounded-4 p-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+      <h3 class="fw-bold mb-0">Trending In Store</h3>
+      <ul class="nav nav-pills" id="trendingTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active rounded-pill px-3 fw-semibold" id="bestsellers-tab" data-bs-toggle="pill" data-bs-target="#bestsellers-pane" type="button" role="tab">
+            <i class="bi bi-fire text-danger me-1"></i> Best Sellers
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link rounded-pill px-3 fw-semibold ms-2" id="newarrivals-tab" data-bs-toggle="pill" data-bs-target="#newarrivals-pane" type="button" role="tab">
+            <i class="bi bi-sparkles text-primary me-1"></i> New Arrivals
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="tab-content" id="trendingTabsContent">
+      <div class="tab-pane fade show active" id="bestsellers-pane" role="tabpanel">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+          {% for product in best_sellers|slice:":4" %}
+            <div class="col">
+              {% include 'includes/product_card.html' with product=product %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="newarrivals-pane" role="tabpanel">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+          {% for product in new_arrivals|slice:":4" %}
+            <div class="col">
+              {% include 'includes/product_card.html' with product=product %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. Verified Buyer Reviews & Testimonials -->
+{% if testimonials %}
+<section class="container mb-5">
+  <div class="text-center max-w-700 mx-auto mb-4">
+    <span class="badge bg-primary-subtle text-primary fw-bold text-uppercase px-3 py-1 rounded-pill mb-2">Verified Buyers</span>
+    <h3 class="fw-bold">Loved By Shoppers Worldwide</h3>
+    <p class="text-muted small">Read honest ratings and feedback from our community of registered buyers.</p>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for review in testimonials|slice:":3" %}
+      <div class="col">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-4">
+          <div class="stars mb-2">
+            {% for i in "12345"|make_list %}
+              {% if forloop.counter <= review.rating %}
+                <i class="bi bi-star-fill"></i>
+              {% else %}
+                <i class="bi bi-star"></i>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <h6 class="fw-bold mb-2">"{{ review.title|default:'Outstanding Quality' }}"</h6>
+          <p class="text-muted small flex-grow-1">"{{ review.comment|truncatewords:30 }}"</p>
+          <div class="d-flex align-items-center gap-2 pt-2 border-top">
+            <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; font-size: 0.8rem;">
+              {{ review.user.first_name|default:review.user.username|slice:":1"|upper }}
+            </div>
+            <div>
+              <div class="fw-semibold small text-dark">{{ review.user.full_name }}</div>
+              <small class="text-success" style="font-size: 0.75rem;"><i class="bi bi-patch-check-fill"></i> Verified Purchase</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- 9. Coupon Callout Banner -->
+<section class="container mb-5">
+  <div class="p-4 p-lg-5 rounded-4 shadow-sm text-center position-relative overflow-hidden" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white;">
+    <h2 class="fw-bold mb-2">First Time Shopping at ShopSphere?</h2>
+    <p class="text-light opacity-75 small mb-4 max-w-600 mx-auto">
+      Unlock 20% instant discount on your order with coupon code <strong class="text-warning">SPHERE20</strong> during checkout. Minimum cart value $100.
+    </p>
+    <a href="{% url 'products:product_list' %}" class="btn btn-warning text-dark btn-lg rounded-pill px-4 fw-bold shadow">
+      Start Shopping Now &rarr;
+    </a>
+  </div>
+</section>
+
+{% endblock %}
